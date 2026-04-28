@@ -116,8 +116,29 @@ class InvestmentController extends Controller
             return back()->withInput()->withErrors(['stock_name' => 'Error: Initialization Failed. The provided Asset Designation (' . $request->stock_name . ') does not physically exist on tracked live markets! Please enter a valid Indian Ticker (e.g., RELIANCE).']);
         }
         
+        $tickerName = str_replace('.NS', '', $liveData['ticker']);
+        
+        $existingHolding = auth()->user()->holdings()->where('stock_name', $tickerName)->first();
+        
+        if ($existingHolding) {
+            // Calculate new average buy price and total quantity
+            $totalOldValue = $existingHolding->quantity * $existingHolding->buy_price;
+            $totalNewValue = $request->quantity * $request->buy_price;
+            $newQuantity = $existingHolding->quantity + $request->quantity;
+            $averageBuyPrice = ($totalOldValue + $totalNewValue) / $newQuantity;
+            
+            $existingHolding->update([
+                'quantity' => $newQuantity,
+                'buy_price' => $averageBuyPrice,
+                'current_price' => $liveData['price'],
+                'previous_close' => $liveData['previousClose']
+            ]);
+            
+            return back()->with('success', 'Existing holding updated with new quantity and averaged buy price.');
+        }
+
         auth()->user()->holdings()->create([
-            'stock_name' => str_replace('.NS', '', $liveData['ticker']),
+            'stock_name' => $tickerName,
             'quantity' => $request->quantity,
             'buy_price' => $request->buy_price,
             'buy_date' => $request->buy_date,

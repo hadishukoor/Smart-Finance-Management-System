@@ -122,14 +122,6 @@
                             <td class="py-3 fw-bold text-muted">₹{{ number_format($holding->buy_price, 2) }}</td>
                             <td class="py-3 fw-bold">
                                 ₹{{ number_format($holding->current_price, 2) }}
-                                <form action="{{ route('investments.update', $holding->id) }}" method="POST" class="d-inline ms-2">
-                                    @csrf
-                                    @method('PUT')
-                                    <div class="input-group input-group-sm d-inline-flex mt-1" style="width: 140px;">
-                                        <input type="number" step="0.01" name="current_price" class="form-control fw-bold border-secondary border-opacity-25" placeholder="New Price" required>
-                                        <button class="btn btn-primary px-2" type="submit" title="Sync Market Price"><i class="bi bi-arrow-repeat"></i> Update</button>
-                                    </div>
-                                </form>
                             </td>
                             <td class="py-3">
                                 <span class="fw-bold text-{{ $plClass }} d-block fs-5">₹{{ number_format($pl, 2) }}</span>
