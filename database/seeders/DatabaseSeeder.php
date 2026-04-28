@@ -45,5 +45,30 @@ class DatabaseSeeder extends Seeder
         foreach($expenses as $data) {
             $user->expenses()->create($data);
         }
+
+        // Seed Holdings for SUZLON and REDINGTON securely using live fetched parameters
+        $suzlon = \App\Services\YahooFinanceService::getLivePrice('SUZLON');
+        if($suzlon['valid']) {
+            $user->holdings()->create([
+                'stock_name' => str_replace('.NS', '', $suzlon['ticker']),
+                'quantity' => 2000,
+                'buy_price' => 38.50,
+                'buy_date' => now()->subMonths(3),
+                'current_price' => $suzlon['price'],
+                'previous_close' => $suzlon['previousClose']
+            ]);
+        }
+
+        $redington = \App\Services\YahooFinanceService::getLivePrice('REDINGTON');
+        if($redington['valid']) {
+            $user->holdings()->create([
+                'stock_name' => str_replace('.NS', '', $redington['ticker']),
+                'quantity' => 150,
+                'buy_price' => 195.20,
+                'buy_date' => now()->subWeeks(5),
+                'current_price' => $redington['price'],
+                'previous_close' => $redington['previousClose']
+            ]);
+        }
     }
 }
