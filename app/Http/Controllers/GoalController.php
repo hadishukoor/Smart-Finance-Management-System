@@ -64,8 +64,10 @@ class GoalController extends Controller
                 ];
             }
         }
+        $activeGoals = $goals->filter(fn($g) => $g->saved_amount < $g->target_amount);
+        $achievedGoals = $goals->filter(fn($g) => $g->saved_amount >= $g->target_amount);
         
-        return view('goals.index', compact('goals', 'salary', 'needsMax', 'wantsMax', 'savingsMax', 'recommendations'));
+        return view('goals.index', compact('activeGoals', 'achievedGoals', 'salary', 'needsMax', 'wantsMax', 'savingsMax', 'recommendations'));
     }
     
     public function store(Request $request)

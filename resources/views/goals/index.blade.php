@@ -55,9 +55,9 @@
     </div>
 </div>
 
-@if($goals->count() > 0)
+@if($activeGoals->count() > 0)
     <div class="row g-4">
-        @foreach($goals as $goal)
+        @foreach($activeGoals as $goal)
             @php
                 $percentage = $goal->target_amount > 0 ? ($goal->saved_amount / $goal->target_amount) * 100 : 0;
                 $percentageClamped = min(100, $percentage);
@@ -131,12 +131,36 @@
 @else
     <div class="glass-card hover-elevate border-0 p-5 p-md-5 mb-5 text-center shadow-sm">
         <i class="bi bi-bag-heart-fill text-muted opacity-25" style="font-size: 5rem;"></i>
-        <h3 class="fw-bold text-dark mt-4">No Targets Initialized</h3>
-        <p class="text-muted lh-base px-lg-5 fs-5">Your Bucket List is empty. Initialize a dream asset mapping (like a car or gadget) and allow our 50/30/20 algorithm to reverse-engineer an absolute timeline for mathematically secure acquisition.</p>
+        <h3 class="fw-bold text-dark mt-4">No Active Targets</h3>
+        <p class="text-muted lh-base px-lg-5 fs-5">Your active Bucket List is empty. Initialize a dream asset mapping (like a car or gadget) and allow our 50/30/20 algorithm to reverse-engineer an absolute timeline for mathematically secure acquisition.</p>
         <button class="btn btn-gradient btn-lg text-white rounded-pill px-5 shadow-sm fw-bold hover-elevate mt-3 mb-2" data-bs-toggle="modal" data-bs-target="#addGoalModal">
-            Create First Dream Target
+            Create Dream Target
         </button>
     </div>
+@endif
+
+@if($achievedGoals->count() > 0)
+<div class="mt-5 pt-4 border-top border-light-subtle">
+    <h3 class="fw-bold text-dark mb-4"><i class="bi bi-trophy-fill text-warning me-2"></i> Achieved & Acquired ({{ $achievedGoals->count() }})</h3>
+    <div class="row g-4 opacity-75">
+        @foreach($achievedGoals as $goal)
+            <div class="col-xl-4 col-lg-6">
+                <div class="glass-card border-0 p-4 h-100 shadow-sm bg-success bg-opacity-10 border border-success border-opacity-25 position-relative">
+                    <div class="position-absolute top-0 end-0 p-3">
+                        <i class="bi bi-check-circle-fill text-success fs-3"></i>
+                    </div>
+                    <h5 class="fw-bold text-dark mb-1 pe-4">{{ $goal->goal_title }}</h5>
+                    <p class="text-muted mb-3 fw-bold">₹{{ number_format($goal->target_amount, 0) }}</p>
+                    <form action="{{ route('goals.destroy', $goal->id) }}" method="POST" onsubmit="return confirm('Remove this achieved record?');">
+                        @csrf
+                        @method('DELETE')
+                        <button class="btn btn-sm btn-outline-danger fw-bold rounded-pill px-3 shadow-sm mt-2">Clear Record</button>
+                    </form>
+                </div>
+            </div>
+        @endforeach
+    </div>
+</div>
 @endif
 
 <!-- Add Goal Bootstrap Modal -->
